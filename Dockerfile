@@ -22,8 +22,11 @@ RUN microdnf -y update && microdnf -y install git gcc-c++ libgomp \
         && mkdir ${PREFIX}
 
 # gmp-ecm source
-WORKDIR /tmp
-RUN git clone --depth 1 https://gitlab.inria.fr/zimmerma/ecm.git
+WORKDIR /tmp/ecm
+RUN git init \
+        && git remote add origin https://gitlab.inria.fr/zimmerma/ecm.git \
+        && git fetch origin ${ECM_COMMIT} \
+        && git reset --hard FETCH_HEAD
 
 # gmplib
 WORKDIR /tmp
@@ -36,8 +39,7 @@ RUN tar -xf gmp-${GMP_VER}.tar.xz && cd gmp-${GMP_VER} \
 
 # gmp-ecm (redistributable)
 WORKDIR /tmp/ecm
-RUN git checkout ${ECM_COMMIT} \
-        && autoreconf -vfi \
+RUN autoreconf -vfi \
         && CFLAGS='-flto -mtune=native -march=native' ./configure --prefix=${PREFIX} \
                 --with-gmp=${PREFIX} --enable-openmp --disable-assert \
         && make -j ${BUILDER_THREADS} && make check \
