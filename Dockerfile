@@ -16,9 +16,8 @@ ARG REDISTRIBUTABLE=yes
 ARG GWNUM_VER=303b6
 
 
-RUN microdnf -y update && microdnf -y install git g++ libgomp \
-                make autoconf automake \
-                libtool m4 xz unzip \
+RUN microdnf -y update && microdnf -y install git gcc-c++ libgomp \
+                make autoconf libtool m4 xz unzip \
         && microdnf clean all \
         && mkdir ${PREFIX}
 
